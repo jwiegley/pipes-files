@@ -297,7 +297,7 @@ anewer_ path = do
 
 empty_ :: MonadIO m => CondT (FileEntry f) m ()
 empty_ = (regular   >> hasStatus ((== 0) . fileSize))
-     <|> (directory >> hasStatus ((== 2) . linkCount))
+ `mplus` (directory >> hasStatus ((== 2) . linkCount))
 
 executable_ :: MonadIO m => CondT (FileEntry f) m ()
 executable_ = executable
@@ -349,7 +349,7 @@ applyStat mfollow = do
     ms <- liftIO . getStat mfollow =<< query
     case ms of
         Nothing      -> prune >> error "This is never reached"
-        Just (s, e') -> s <$ update e'
+        Just (s, e') -> const s `liftM` update e'
 
 lstat :: MonadIO m => CondT (FileEntry f) m FileStatus
 lstat = applyStat (Just False)
