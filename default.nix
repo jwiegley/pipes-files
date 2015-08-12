@@ -7,7 +7,7 @@
 }:
 mkDerivation {
   pname = "pipes-files";
-  version = "0.1.0";
+  version = "0.1.1";
   src = ./.;
   libraryHaskellDepends = [
     attoparsec base bytestring directory exceptions filepath free
