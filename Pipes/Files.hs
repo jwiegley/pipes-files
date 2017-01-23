@@ -545,15 +545,15 @@ directoryFiles path = CofreeT $ Select $ do
         Left (_ :: IOException) -> return ()
             -- liftIO $ putStrLn $
             --     "Error reading directory " ++ path ++ ": " ++ show e
-        Right entries -> forM_ entries $ \entry ->
-            unless (entry `elem` [".", ".."]) $ do
+        Right entries ->
+            forM_ (filter (`notElem` [".", ".."]) entries) $ \entry -> do
                 let fullPath = path ++ "/" ++ entry
                 estat <- liftIO $ E.try $ getFileStatus fullPath
                 case estat of
                     Left (_ :: IOException) -> return ()
                     Right st ->
                         yield (fullPath :< if isDirectory st
-                                           then Just (directoryFiles fullPath)
+                                           then Just $ directoryFiles fullPath
                                            else Nothing)
 
 genericFindFiles
