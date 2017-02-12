@@ -85,7 +85,9 @@ test-suite test
     , pipes-files
     , pipes              >=4.1  && <4.4
     , directory          >=1.2  && <1.4
+    , filepath
     , unix               >=2.7  && <2.8
+    , temporary          >=1.1  && <1.3
     , transformers       >=0.3  && <0.6
     , mtl                >=2.1  && <2.3
     , hspec              >=1.4.4
