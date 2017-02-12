@@ -20,6 +20,7 @@ main = do
     hspec . around withSandbox $ do
         beforeWith populateDirTree $ do
             describe "listDirTree" listDirTreeSpec
+            describe "listDirTreeCond" listDirTreeCondSpec
 
 findsExpected :: Expectation
 findsExpected = do
@@ -92,3 +93,28 @@ listDirTreeSpec :: SpecWith FilePath
 listDirTreeSpec = it "lists directory tree" $ \dir ->
     listDirTree dir `shouldReturn` map (dir </>) (d ++ f)
         where (d, f) = dirTree
+
+listDirTreeCond :: FilePath -> IO [FilePath]
+listDirTreeCond dir = toListM (enumerate (walk files)) >>= return . sort
+    where
+        files = winnow (directoryFiles dir) $ do
+            -- TODO we can add multiple conditions in a single test
+            --  We can also add separate test cases for more conditionals
+            when_ (guardM_ (genericTest directory)) prune
+
+listDirTreeCondSpec :: SpecWith FilePath
+listDirTreeCondSpec = it "lists directory tree using conditionals" $ \dir ->
+    listDirTreeCond dir `shouldReturn` map (dir </>) (d ++ f)
+        where (d, f) =
+                    (
+                      [
+                      --  "a"
+                      --, "b"
+                      --, "b/c"
+                      ],
+                      [
+                      --  "b/c/three.txt"
+                      --, "b/two.txt"
+                        "one.txt"
+                      ]
+                    )
