@@ -35,16 +35,16 @@ library
     , Pipes.Files.Directory
     , Pipes.Files.Types
   build-depends:       
-      base                >=4.7  && <4.10
+      base                >=4.7  && <5
     , transformers        >=0.3  && <0.6
     , transformers-base   >=0.3  && <0.6
     , transformers-compat >=0.3  && <0.6
     , exceptions          >=0.8  && <0.9
-    , mmorph              >=1.0  && <1.1
+    , mmorph              >=1.0  && <2
     , mtl                 >=2.1  && <2.3
     , monad-control       >=1.0  && <1.1
     , semigroups          >=0.16 && <0.19
-    , free                >=4.12 && <4.13
+    , free                >=4.12 && <6
     , pipes               >=4.1  && <4.4
     , directory           >=1.2  && <1.4
     , unix                >=2.7  && <2.8
@@ -58,6 +58,7 @@ library
     , filepath
     , posix-paths
     , pipes-safe
+    , logict
   -- hs-source-dirs:      
   default-language:    Haskell2010
 
@@ -90,6 +91,7 @@ test-suite test
     , mtl                >=2.1  && <2.3
     , hspec              >=1.4.4
     , hspec-expectations >=0.3
+    , logict
 
 test-suite find-hs
   default-language: Haskell2010

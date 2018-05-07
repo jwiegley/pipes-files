@@ -92,6 +92,7 @@ import           Control.Cond hiding (test)
 import           Control.Exception as E
 import           Control.Monad
 import           Control.Monad.IO.Class
+import           Control.Monad.Logic
 import           Control.Monad.Morph
 import           Control.Monad.Trans.Control
 import           Data.Attoparsec.Text as A
@@ -105,12 +106,12 @@ import           Data.Time
 import           Data.Time.Clock.POSIX
 import           Data.Word (Word8)
 import           Foreign.C
+import           Hierarchy
 import           Pipes
 import           Pipes.Files.Directory
 import           Pipes.Files.Types
 import qualified Pipes.Prelude as P
 import           Pipes.Safe
-import           Pipes.Tree
 import           Prelude
 import           System.Directory hiding (executable, findFiles)
 import           System.Posix.ByteString.FilePath
@@ -539,22 +540,22 @@ handleEntryIO opts path cond nextDepth f (!fp, !typ) = do
 
 -- | Return all files within a directory tree, hierarchically.
 directoryFiles :: MonadIO m => FilePath -> TreeT m FilePath
-directoryFiles path = CofreeT $ Select $ do
+directoryFiles path = CofreeT $ do
     eres <- liftIO $ E.try $ getDirectoryContents path
     case eres of
-        Left (_ :: IOException) -> return ()
+        Left (_ :: IOException) -> mzero
             -- liftIO $ putStrLn $
             --     "Error reading directory " ++ path ++ ": " ++ show e
         Right entries ->
-            forM_ (filter (`notElem` [".", ".."]) entries) $ \entry -> do
+            considering (filter (`notElem` [".", ".."]) entries) >>- \entry -> do
                 let fullPath = path ++ "/" ++ entry
                 estat <- liftIO $ E.try $ getFileStatus fullPath
                 case estat of
-                    Left (_ :: IOException) -> return ()
+                    Left (_ :: IOException) -> mzero
                     Right st ->
-                        yield (fullPath :< if isDirectory st
-                                           then Just $ directoryFiles fullPath
-                                           else Nothing)
+                        pure (fullPath :< if isDirectory st
+                                          then Just $ directoryFiles fullPath
+                                          else Nothing)
 
 genericFindFiles
     :: (MonadIO m, MonadBaseControl IO m,
