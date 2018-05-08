@@ -541,7 +541,7 @@ handleEntryIO opts path cond nextDepth f (!fp, !typ) = do
 {-# INLINE handleEntryIO #-}
 
 -- | Return all files within a directory tree, hierarchically.
-directoryFiles :: MonadIO m => FilePath -> TreeT m FilePath
+directoryFiles :: (MonadPlus m, MonadIO m) => FilePath -> TreeT m FilePath
 directoryFiles path = CofreeT $ do
     Right entries <-
         liftIO $ E.try @E.SomeException $ getDirectoryContents path
