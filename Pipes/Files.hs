@@ -545,7 +545,7 @@ directoryFiles :: MonadIO m => FilePath -> TreeT m FilePath
 directoryFiles path = CofreeT $ do
     Right entries <-
         liftIO $ E.try @E.SomeException $ getDirectoryContents path
-    entry <- considering (filter (`notElem` [".", ".."]) entries)
+    entry <- select (filter (`notElem` [".", ".."]) entries)
     let fullPath = path ++ "/" ++ entry
     Right st <- liftIO $ E.try @E.SomeException $ getFileStatus fullPath
     pure $ fullPath :<
