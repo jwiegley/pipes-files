@@ -26,7 +26,13 @@ in haskellPackages.developPackage {
   root = ./.;
 
   source-overrides = {
-    hierarchy = ../hierarchy;
+    hierarchy = pkgs.fetchFromGitHub {
+      owner  = "jwiegley";
+      repo   = "hierarchy";
+      rev    = "v1.0.1";
+      sha256 = "07nwqwq9c3rxn05rrq1dmr4z592klbxcwnjb47v1ya11dxvic3ma";
+      # date = 2018-05-08T12:27:37-07:00;
+    };
   };
 
   modifier = drv: pkgs.haskell.lib.overrideCabal drv (attrs: {
