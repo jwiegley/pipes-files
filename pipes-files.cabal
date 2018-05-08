@@ -48,7 +48,7 @@ library
     , pipes               >=4.1  && <4.4
     , directory           >=1.2  && <1.4
     , unix                >=2.7  && <2.8
-    , hierarchy           >=0.2.1
+    , hierarchy           >=1.0.0
     , regex-posix
     , unix-compat
     , attoparsec
@@ -82,7 +82,7 @@ test-suite test
   main-is:          Main.hs
   build-depends: 
       base >=3
-    , hierarchy
+    , hierarchy          >=1.0.0
     , pipes-files
     , pipes              >=4.1  && <4.4
     , directory          >=1.2  && <1.4
