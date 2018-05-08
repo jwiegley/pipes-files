@@ -3,8 +3,10 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RankNTypes #-}
-{-# LANGUAGE TupleSections #-}
 {-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TupleSections #-}
+{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE ViewPatterns #-}
 
 module Pipes.Files
     (
@@ -541,21 +543,15 @@ handleEntryIO opts path cond nextDepth f (!fp, !typ) = do
 -- | Return all files within a directory tree, hierarchically.
 directoryFiles :: MonadIO m => FilePath -> TreeT m FilePath
 directoryFiles path = CofreeT $ do
-    eres <- liftIO $ E.try $ getDirectoryContents path
-    case eres of
-        Left (_ :: IOException) -> mzero
-            -- liftIO $ putStrLn $
-            --     "Error reading directory " ++ path ++ ": " ++ show e
-        Right entries ->
-            considering (filter (`notElem` [".", ".."]) entries) >>- \entry -> do
-                let fullPath = path ++ "/" ++ entry
-                estat <- liftIO $ E.try $ getFileStatus fullPath
-                case estat of
-                    Left (_ :: IOException) -> mzero
-                    Right st ->
-                        pure (fullPath :< if isDirectory st
-                                          then Just $ directoryFiles fullPath
-                                          else Nothing)
+    Right entries <-
+        liftIO $ E.try @E.SomeException $ getDirectoryContents path
+    entry <- considering (filter (`notElem` [".", ".."]) entries)
+    let fullPath = path ++ "/" ++ entry
+    Right st <- liftIO $ E.try @E.SomeException $ getFileStatus fullPath
+    pure $ fullPath :<
+        if isDirectory st
+        then Just (directoryFiles fullPath)
+        else Nothing
 
 genericFindFiles
     :: (MonadIO m, MonadBaseControl IO m,
