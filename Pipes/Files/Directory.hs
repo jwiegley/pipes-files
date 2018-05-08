@@ -32,7 +32,7 @@ openDirStream name = withFilePath name $ \s ->
     throwErrnoPathIfNullRetry "openDirStream" name $ c_opendir s
 {-# INLINE openDirStream #-}
 
-foreign import ccall unsafe "__hsunix_opendir"
+foreign import ccall unsafe "opendir"
    c_opendir :: CString  -> IO (Ptr CDir)
 
 getDirectoryContentsAndAttrs :: RawFilePath -> IO [(RawFilePath, CUInt)]
