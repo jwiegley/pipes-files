@@ -1,0 +1,23 @@
+language: nix
+
+git:
+  depth: 1
+
+env:
+  global:
+  matrix:
+    - GHCVERSION=ghc822 PROFILING=false
+    - GHCVERSION=ghc822 PROFILING=true
+    - GHCVERSION=ghc842 PROFILING=false
+    - GHCVERSION=ghc842 PROFILING=true
+
+matrix:
+  allow_failures:
+  exclude:
+
+script:
+  - nix-build --argstr compiler $GHCVERSION --arg doProfiling $PROFILING
+
+branches:
+  only:
+    - master
