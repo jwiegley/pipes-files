@@ -1,5 +1,7 @@
 language: nix
 
+sudo: true
+
 git:
   depth: 1
 

@@ -3,22 +3,34 @@
 , doBenchmark ? false
 , doTracing   ? false
 , doStrict    ? false
-, rev         ? "255a833e841628c0b834575664eae373e28cdc27"
-, sha256      ? "022xm1pf4fpjjy69g7qz6rpqnwpjcy1l0vj49m8xmgn553cs42ch"
-# , nixpkgs     ? import ((import <nixpkgs> {}).fetchFromGitHub {
-#     owner = "NixOS"; repo = "nixpkgs"; inherit rev sha256; }) {
+, rev         ? "9d0b6b9dfc92a2704e2111aa836f5bdbf8c9ba42"
+, sha256      ? "096r7ylnwz4nshrfkh127dg8nhrcvgpr69l4xrdgy3kbq049r3nb"
 , nixpkgs     ? import (builtins.fetchTarball {
     url = "https://github.com/NixOS/nixpkgs/archive/${rev}.tar.gz";
     inherit sha256; }) {
     config.allowUnfree = true;
     config.allowBroken = false;
   }
+, provideDrv  ? !nixpkgs.pkgs.lib.inNixShell
 }:
 
 let inherit (nixpkgs) pkgs;
 
   haskellPackages = pkgs.haskell.packages.${compiler}.override {
-    overrides = with pkgs.haskell.lib; self: super: rec {
+    overrides = with pkgs.haskell.lib; self: super: {
+      developPackage =
+        { root
+        , source-overrides ? {}
+        , overrides ? self: super: {}
+        , modifier ? drv: drv
+        , provideDrv ? !pkgs.lib.inNixShell }:
+        let drv =
+          (pkgs.haskell.packages.${compiler}.extend
+             (pkgs.lib.composeExtensions
+                (self.packageSourceOverrides source-overrides)
+                overrides))
+          .callCabal2nix (builtins.baseNameOf root) root {};
+        in if provideDrv then modifier drv else (modifier drv).env;
     };
   };
 
@@ -26,12 +38,13 @@ in haskellPackages.developPackage {
   root = ./.;
 
   source-overrides = {
+    exceptions = "0.10.0";
     hierarchy = pkgs.fetchFromGitHub {
       owner  = "jwiegley";
       repo   = "hierarchy";
-      rev    = "v1.0.1";
-      sha256 = "07nwqwq9c3rxn05rrq1dmr4z592klbxcwnjb47v1ya11dxvic3ma";
-      # date = 2018-05-08T12:27:37-07:00;
+      rev    = "v1.0.2";
+      sha256 = "1a7q8f78ylyqmm0xyc9ma7nid4fn4sbw47sjc2d7815acn6mh29r";
+      # date = 2018-05-10T23:29:32-07:00;
     };
   };
 
@@ -41,4 +54,6 @@ in haskellPackages.developPackage {
 
     inherit doBenchmark;
   });
+
+  inherit provideDrv;
 }
