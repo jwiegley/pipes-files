@@ -16,7 +16,9 @@
 
 let inherit (nixpkgs) pkgs;
 
-  haskellPackages = pkgs.haskell.packages.${compiler}.override {
+  haskellPackages' = pkgs.haskell.packages.${compiler};
+
+  haskellPackages = pkgs.lib.fix (this: haskellPackages'.override {
     overrides = with pkgs.haskell.lib; self: super: {
       developPackage =
         { root
@@ -25,14 +27,14 @@ let inherit (nixpkgs) pkgs;
         , modifier ? drv: drv
         , provideDrv ? !pkgs.lib.inNixShell }:
         let drv =
-          (pkgs.haskell.packages.${compiler}.extend
+          (this.extend
              (pkgs.lib.composeExtensions
                 (self.packageSourceOverrides source-overrides)
                 overrides))
           .callCabal2nix (builtins.baseNameOf root) root {};
         in if provideDrv then modifier drv else (modifier drv).env;
     };
-  };
+  });
 
 in haskellPackages.developPackage {
   root = ./.;
