@@ -38,7 +38,7 @@ library
       base                >=4.7  && <5
     , transformers        >=0.3  && <0.6
     , transformers-base   >=0.3  && <0.6
-    , transformers-compat >=0.3  && <0.6
+    , transformers-compat >=0.3  && <1.0
     , exceptions          >=0.10 && <1.0
     , mmorph              >=1.0  && <2
     , mtl                 >=2.1  && <2.3
