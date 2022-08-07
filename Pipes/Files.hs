@@ -125,7 +125,7 @@ import           Text.Regex.Posix ((=~))
 {- $intro
 
 **find-conduit** is essentially a souped version of GNU find for Haskell,
-using a DSL to provide both ease of us, and extensive flexbility.
+using a DSL to provide both ease of use, and extensive flexbility.
 
 In its simplest form, let's compare some uses of find to find-conduit.  Bear
 in mind that the result of the find function is a conduit, so you're expected
@@ -214,7 +214,7 @@ to the full file information after the stat.
 
 {- $notes
 
-See 'Data.Cond' for more details on the Monad used to build predicates.
+See 'CondT' for more details on the Monad used to build predicates.
 -}
 
 getEntryPath :: (Monad m, IsFilePath f) => CondT (FileEntry f) m f
