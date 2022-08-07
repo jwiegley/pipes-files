@@ -4,8 +4,9 @@ module Main where
 
 import Control.Cond
 import Control.Monad
+import Control.Monad.Logic
 import Data.List
-import Pipes
+import Hierarchy
 import Pipes.Files
 import Pipes.Prelude (toListM)
 import Pipes.Tree
@@ -62,7 +63,7 @@ findsExpected = do
                    , "./test/doctest.hs"
                    , "./test/find-hs.hs"
                    ]
-    found <- toListM $ enumerate (walk files)
+    found <- observeAllT $ walk files
     sort found `shouldBe` expected
 
 withSandbox :: ActionWith FilePath -> IO ()
